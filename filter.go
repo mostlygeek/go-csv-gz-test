@@ -49,13 +49,20 @@ func main() {
 		var mutex sync.Mutex
 		var wg sync.WaitGroup
 		numCPU := runtime.NumCPU()
+		fileCh := make(chan string, numCPU+1)
+
 		fmt.Printf("Strategy: Parallel, %d Workers ...\n", numCPU)
 
-		fileCh := make(chan string, numCPU*2)
+		// fill the filename channel with work to do
 		go func() {
 			for _, fn := range files {
 				fileCh <- fn
 			}
+
+			// where there is no more files to process
+			// send an "EOF" signal so one of the workers can
+			// close the fileCh channel which will cause all
+			// workers to finish up
 			fileCh <- "EOF"
 		}()
 
@@ -64,14 +71,13 @@ func main() {
 			wg.Add(1)
 			go func(id int) {
 				for fn := range fileCh {
-					// there's no more files to process, doesn't matter
-					// which worker recieves this first
 					if fn == "EOF" {
 						close(fileCh) // causes all workers routines to finish
 						break
 					}
 
 					fmt.Printf("Processing(%d): %s\n", id, fn)
+
 					t, m, err := ProcessFile(minimumTime, fn)
 					if err != nil {
 						fmt.Printf("Error: %s\n", err.Error())
