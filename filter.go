@@ -45,9 +45,7 @@ func main() {
 				matched += m
 			}
 		}
-	} else {
-
-		// do things in parallel
+	} else { // do things in parallel
 		var mutex sync.Mutex
 		var wg sync.WaitGroup
 		numCPU := runtime.NumCPU()
@@ -61,11 +59,10 @@ func main() {
 			fileCh <- "EOF"
 		}()
 
-		// start up
+		// start up numCPU number of working goroutines
 		for i := 0; i < numCPU; i++ {
 			wg.Add(1)
 			go func(id int) {
-				defer wg.Done()
 				for fn := range fileCh {
 					// there's no more files to process, doesn't matter
 					// which worker recieves this first
@@ -85,6 +82,8 @@ func main() {
 						mutex.Unlock()
 					}
 				}
+
+				wg.Done()
 			}(i)
 		}
 
