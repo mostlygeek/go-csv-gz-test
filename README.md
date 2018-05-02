@@ -8,29 +8,30 @@ S3 inventory .csv.gz files fastest!
 
 ## Usage
 
-````
-# get some, downloads 1GB from S3. So we can use the same input
-# to benchmark implementations
+```
+# get some working data, downloads 1GB from S3 into testdata/ subdirectory
 > ./download.sh
 
-# use a one file at a time strategy
+
+
+# Processing using a one file at a time
 > go run ./filter.go
 
-# use a parallel (one worker / CPU) strategy
-# add a GOPAR=1 env variable
+
+# Processing in parallel (workers = num cpus)
 > GOPAR=1 go run ./filter.go
-````
+```
 
 ## My results (on my late 2017 13" MBP)
 
-````
+```
 Strategy: One file at a time ...
 Total: 31521045, Matched: 710093, Ratio: 2.25%
 Time: 52.740166887s
-````
+```
 
-````
+```
 Strategy: Parallel, 4 Workers ...
 Total: 31521045, Matched: 710093, Ratio: 2.25%
 Time: 27.207802611s
-````
+```
