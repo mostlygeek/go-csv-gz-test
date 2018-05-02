@@ -13,7 +13,6 @@ S3 inventory .csv.gz files fastest!
 > ./download.sh
 
 
-
 # Processing using a one file at a time
 > go run ./filter.go
 
