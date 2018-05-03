@@ -3,11 +3,14 @@ package main
 import (
 	"compress/gzip"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/pprof"
 	"sync"
 	"time"
 
@@ -16,6 +19,7 @@ import (
 
 var (
 	minimumTime time.Time
+	cpuprofile  = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
 func init() {
@@ -23,6 +27,17 @@ func init() {
 }
 
 func main() {
+
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	var pattern = "./testdata/*.csv.gz"
 	files, err := filepath.Glob(pattern)
 	if err != nil {
